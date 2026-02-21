@@ -1576,22 +1576,36 @@ ul { list-style: none; }
   document.addEventListener('click', () => langDropdown.classList.remove('open'));
 
   // ── Scroll reveal ──
-  // ── Scroll reveal ──
   const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-  setTimeout(() => {
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el => {
-      el.classList.add('visible');
+  // ── Smooth scroll ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        const offset = navbar.offsetHeight + 20;
+        window.scrollTo({ top: target.offsetTop - offset, behavior: 'smooth' });
+      }
     });
+  });
+
+  // ── Close mobile nav on outside click ──
+  document.addEventListener('click', (e) => {
+    if (!navLinks.contains(e.target) && !hamburger.contains(e.target)) {
+      navLinks.classList.remove('open');
+    }
+  });
+
+  // ── Calendly popup fallback ──
+  setTimeout(() => {
+    const widget = document.querySelector('.calendly-inline-widget');
+    if (widget && !widget.querySelector('iframe')) {
+      widget.innerHTML = '<div style="padding:3rem;text-align:center;color:var(--mid);"><p>Calendar loading...</p><p style="margin-top:1rem;"><a href="https://calendly.com/pkyl-fairfox/book-1-1-live-demo-clone" target="_blank" style="color:var(--teal);font-weight:600;">Click here to book directly on Calendly →</a></p></div>';
+    }
   }, 1500);
 </script>
 
